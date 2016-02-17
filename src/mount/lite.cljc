@@ -1,9 +1,15 @@
+;;; Features initialisation
+
+(require 'mount.lite.features)
+
+;;; Actual namespace
+
 (ns mount.lite
   "The core namespace providing the public API"
   (:require [clojure.set :as set]
-            [clojure.tools.namespace.dependency :as dep]
-            [mount.lite.graph :as graph]
-            [mount.lite.parallel :as parallel]))
+            #?@(:graph ([clojure.tools.namespace.dependency :as dep]
+                        [mount.lite.graph :as graph]
+                        [mount.lite.parallel :as parallel]))))
 
 ;;; Types
 
@@ -64,7 +70,7 @@
                            clojure.main clojure.pprint clojure.reflect clojure.repl clojure.set
                            clojure.stacktrace clojure.string clojure.template clojure.test clojure.walk
                            clojure.xml clojure.zip])
-                   (set/union (dep/transitive-dependencies (graph/ns-graph) *ns*)))
+                   #?(:graph (set/union (dep/transitive-dependencies (graph/ns-graph) *ns*))))
         xf     (comp (remove ignore) (mapcat ns-interns) (map second) (filter (comp ::order meta)))]
     (fn [] (into #{} xf (all-ns)))))
 
@@ -77,15 +83,18 @@
     (some :parallel optss)   (assoc :parallel (last (keep :parallel optss)))))
 
 (defn- filtered-vars [status opts]
-  (let [filtered  (-> (set (or (:only opts) (all-states)))
+  (let [filtered (-> (set (or (:only opts) (all-states)))
                       (set/difference (set (:except opts)))
                       (->> (filter #(= (-> % meta ::status) status))))]
     (if-let [upto (:up-to opts)]
-      (let [graph (graph/var-graph (conj (set filtered) upto))
-            deps (case status
-                   :stopped (dep/transitive-dependencies graph upto)
-                   :started (dep/transitive-dependents graph upto))]
-        (cond-> deps (= (-> upto meta ::status) status) (conj upto)))
+      #?(:graph (let [graph (graph/var-graph (conj (set filtered) upto))
+                      deps  (case status
+                             :stopped (dep/transitive-dependencies graph upto)
+                             :started (dep/transitive-dependents graph upto))]
+                  (cond-> deps (= (-> upto meta ::status) status) (conj upto)))
+         :default (let [upto-comparator (case status :stopped <= :started >=)
+                        upto-order      (-> upto meta ::order)]
+                    (filter #(upto-comparator (-> % meta ::order) upto-order))))
       filtered)))
 
 (defn- var-state-map [vars opts]
@@ -143,16 +152,17 @@
   ([opts var]
    (assoc opts :up-to var)))
 
-(defn parallel
-  "Creates or updates start/stop option map, starting or stopping
+#?(:graph
+   (defn parallel
+     "Creates or updates start/stop option map, starting or stopping
   independent vars in parallel using the given number of threads.
   Multiple uses of this function on the same option map are overriding
   each other."
-  {:arglists '([threads] [opts threads])}
-  ([threads]
-   {:parallel threads})
-  ([opts threads]
-   (assoc opts :parallel threads)))
+     {:arglists '([threads] [opts threads])}
+     ([threads]
+      {:parallel threads})
+     ([opts threads]
+      (assoc opts :parallel threads))))
 
 (defn start
   "Start all unstarted states (by default). One or more option maps
@@ -184,7 +194,8 @@
         vars (filtered-vars :stopped opts)
         vsm  (var-state-map vars opts)]
     (if-let [threads (:parallel opts)]
-      (parallel/start vars #(start* {% (get vsm %)}) threads)
+      #?(:graph (parallel/start vars #(start* {% (get vsm %)}) threads)
+         :default (throw (ex-info "parallel feature not available" {})))
       (start* vsm))))
 
 (defn stop
@@ -212,7 +223,8 @@
   (let [opts (merge-opts optss)
         vars (filtered-vars :started opts)]
     (if-let [threads (:parallel opts)]
-      (parallel/stop vars #(stop* [%]) threads)
+      #?(:graph (parallel/stop vars #(stop* [%]) threads)
+         :default (throw (ex-info "parallel feature not available")))
       (stop* vars))))
 
 (defn status
