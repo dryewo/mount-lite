@@ -37,6 +37,9 @@
 </ul>
 <h3><a href="#the-on-cascade-option" name="the-on-cascade-option"></a>The :on-cascade option</h3>
 <p>If you don&rsquo;t want your <code>defstate</code> to be stopped whenever a dependency is stopped because it is redefined, you can have your defstate skip the cascading stop with the <code>:on-cascade</code> option on your <code>defstate</code>. If you set this to <code>:skip</code>, the defstate won&rsquo;t be stopped automatically whenever a dependency is redefined that has <code>:cascade</code> as its <code>:on-reload</code> behaviour.</p>
+<h3><a href="#in-summary" name="in-summary"></a>In summary</h3>
+<p>To alter the behaviour for when <em>this</em> state is being reloaded, use <code>:on-reload</code>.</p>
+<p>To alter the behaviour for when <em>another</em> state is being reloaded (and has the <code>:cascade</code> behaviour, which is the default), use <code>:on-cascade</code>.</p>
 <blockquote>
-  <p>NOTE: You can also override the <code>:on-reload</code> behaviour of all the <code>defstates</code> by setting a behaviour using the <code>on-reload</code> function. By setting is back to <code>nil</code>, the <code>:on-reload</code> setting of the <code>defstates</code> is used again.</p>
+  <p>NOTE: You can also override the <code>:on-reload</code> behaviour of all the <code>defstates</code> by setting a behaviour keyword using the <code>on-reload</code> function. By setting is back to <code>nil</code>, the <code>:on-reload</code> setting of the <code>defstates</code> is used again.</p>
 </blockquote></div></div></div></body></html>

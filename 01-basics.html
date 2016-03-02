@@ -3,7 +3,7 @@
 <h2><a href="#what-is-mount-lite-for-" name="what-is-mount-lite-for-"></a>What is mount-lite for?</h2>
 <p>The mount-lite library was inspired by <a href="https://github.com/tolitius/mount">mount</a>. If you know that library, you already know what you can do with it, as mount-lite is based on the same premise.</p>
 <p>This premise is to have a basic lifecycle around the stateful parts of your application. Using this lifecycle, you can quickly bring up the application state, and bring it down again, before reloading (parts of) your application. The mount and mount-lite libraries give you an easy and non-intrusive way of adding such lifecycles to the stateful parts of your application.</p>
-<p>The mount-lite library has some unique features and approach with respect to mount.</p>
+<p>The mount-lite library has some unique features and approach with respect to mount. For more info on why mount-lite was created, see <a href="http://www.functionalbytes.nl/clojure/mount/mount-lite/2016/02/11/mount-lite.html">this blog post</a>.</p>
 <h2><a href="#defining-states" name="defining-states"></a>Defining states</h2>
 <p>First, require the <code>mount.lite</code> namespace. Also require the namespaces which hold the states that the states in the current namespace depend upon.</p>
 <pre><code class="clj">(ns your.app
