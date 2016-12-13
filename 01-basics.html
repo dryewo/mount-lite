@@ -4,10 +4,10 @@
 <p>The mount-lite library was inspired by <a href="https://github.com/tolitius/mount">mount</a>. If you know that library, you already know what you can do with it, as mount-lite is based on the same premise.</p>
 <p>This premise is to have a basic lifecycle around the stateful parts of your application. Using this lifecycle, you can quickly bring up the application state, and bring it down again, before or after reloading (parts of) your application. The mount and mount-lite libraries give you an easy and non-intrusive way of adding such lifecycles to the stateful parts of your application.</p>
 <p>The mount-lite library has some unique features and approach with respect to mount. For more info on why mount-lite was created, see <a href="http://www.functionalbytes.nl/clojure/mount/mount-lite/2016/02/11/mount-lite.html">this blog post</a>.</p>
-<p>That blog post covers the 0.9.x version, and quite some things have changed with version 2.0. In short, the API has been simplified and the feature to have multiple systems of states simultaneously has been added. See <a href="http://www.functionalbytes.nl/clojure/mount/mount-lite/2016/12/09/mount-lite-2.html">this blog post</a> for more info on what has changed, and why.</p>
-<p>This documentation covers the functionality of version 2.x. Version 0.9.x is still supported though, and its documentation can be found in the source repository.</p>
+<p>That blog post covers the 0.9.x version, and quite some things have changed with version 2.0. In short, the API has been simplified and the feature to have multiple systems of states simultaneously has been added. See <a href="http://www.functionalbytes.nl/clojure/mount/mount-lite/2016/12/10/mount-lite-2.html">this blog post</a> for more info on what has changed, and why.</p>
+<p>This documentation covers the functionality of version 2.x. Version 0.9.x is still supported though, and its documentation can be found in the <a href="https://github.com/aroemers/mount-lite/tree/1.x">source repository</a>.</p>
 <h2><a href="#defining-states" name="defining-states"></a>Defining states</h2>
-<p>First, require the <code>mount.lite</code> namespace. Also require the namespaces which hold the states that the states in the current namespace depend upon.</p>
+<p>First, require the <code>mount.lite</code> namespace. Also require the namespaces which hold the states that the states in the current namespace depend upon. This is how mount-lite figures out what states should be started before the states in the current namespace is started.</p>
 <pre><code class="clj">(ns your.app
   (:require [mount.lite :refer (defstate) :as mount]
             [your.app.config :as config] ;; &lt;-- Also has a defstate defined.
@@ -20,9 +20,9 @@
 ;=&gt; #&#39;your.app/db
 </code></pre>
 <p>As you can see, the var <code>#&#39;your.app/db</code> has been defined. It currently is in the <code>:stopped</code> status.</p>
-<p>The <code>:start</code> expression above uses another global state - <code>config/config</code> - which it dereferences to get its value. The <code>:stop</code> expression uses its own value in the same way.</p>
+<p>The <code>:start</code> expression above uses another global state - <code>your.app.config/config</code> - which it dereferences to get its value. The <code>:stop</code> expression uses its own value in the same way. This dereferencing is the way you get the value of a started state, anywhere in your application.</p>
 <h2><a href="#starting-and-stopping-the-states" name="starting-and-stopping-the-states"></a>Starting and stopping the states</h2>
-<p>To start all the global states, just call <code>(mount/start)</code>. A sequence of started global state vars is returned. The order in which the states are started is determined by their load order by the Clojure compiler. Using <code>(mount/stop)</code> stops all the started defstates in reverse order.</p>
+<p>To start all the global states, just call <code>(mount/start)</code>. A sequence of started global state vars is returned. As said before, the order in which the states are started is determined by their load order by the Clojure compiler. Using <code>(mount/stop)</code> stops all the started defstates in reverse order.</p>
 <pre><code class="clj">@db
 ;=&gt; ExceptionInfo: state is not started
 
@@ -35,9 +35,7 @@
 (mount/stop)
 ;=&gt; (#&#39;your.app/db #&#39;your.app.config/config)
 </code></pre>
-<blockquote>
-  <p>NOTE: To get an overview of the status of the defstates, you can use the <code>status</code> function.</p>
-</blockquote>
+<p>To get an overview of the status of the defstates, you can call the <code>(status)</code> function.</p>
 <p><em>Now you know the basics. Go on, try it! I will see you in 10 minutes.</em></p>
 <h2><a href="#meta-data-on-defstate" name="meta-data-on-defstate"></a>Meta data on defstate</h2>
 <p>The <code>defstate</code> macro supports docstrings and attribute maps, as well as meta data on the name of the <code>defstate</code>, just like <code>defn</code>. So, a full <code>defstate</code> might look something like this:</p>
@@ -54,6 +52,8 @@
   <p>Only use <code>defstate</code> in your application namespaces, not in library namespaces, and preferable in the outskirts of your application.  Having a global state does not mean you should forego on the good practice of passing state along as arguments to functions.</p></li>
   <li>
   <p>Only use <code>defstate</code> when either the stateful object needs some stop logic before the application can be reloaded/restarted, or whenever the state depends on another <code>defstate</code>.  In other cases, just use a def.</p></li>
+  <li>
+  <p>Try to use your <code>defstate</code> as if it were private.  Better yet, declare it as private.  This will keep you from refering to your state from every corner of your application, making it more componentized.</p></li>
 </ul>
 <h2><a href="#further-reading" name="further-reading"></a>Further reading</h2>
 <p>Now that you know the basics, it is advised to learn about at least one other feature of mount-lite: <a href="02-substitutions.html">substituting</a>. You could also read on how to <a href="03-start-stop-options.html">start up to or stop down</a> to a certain state, or how to start <a href="04-systems-of-states.html">multiple systems of states</a> simultaneously.</p></div></div></div></body></html>

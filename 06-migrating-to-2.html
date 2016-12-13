@@ -6,6 +6,14 @@
 <p>If you were using the <code>only</code> or <code>except</code> options, see if you can replace them with the &ldquo;up to&rdquo; approach, or with the <a href="05-extension-point.html">extension point</a>, or keep using the 0.9.x version.</p>
 <h2><a href="#dereferencing" name="dereferencing"></a>Dereferencing</h2>
 <p>To use the value of a started state, you need to dereference it by using <code>@</code> or <code>deref</code> now. Dereferencing a stopped state yields an exception.</p>
+<h2><a href="#substitutes-need-to-be-defined-with-the-state-macro" name="substitutes-need-to-be-defined-with-the-state-macro"></a>Substitutes need to be defined with the <em>state</em> macro</h2>
+<p>Substitutes cannot be defined as a simple map anymore. Please use the <code>state</code> macro to create anonymous states. The syntax for the <code>state</code> macro has not changed though, with respect to versions before 2.0. For example:</p>
+<pre><code class="clj">;; This is not supported anymore
+(def sub {:start (fn [] ...)})
+
+;; This is the only supported syntax now
+(def sub (state :start ...))
+</code></pre>
 <h2><a href="#no-more-reloading-behaviour" name="no-more-reloading-behaviour"></a>No more reloading behaviour</h2>
 <p>States are not automatically stopped anymore on redefinition. You need to manually <code>stop</code> and <code>start</code> your states, or use the <a href="https://github.com/clojure/tools.namespace">tools.namespace</a> library. This also means that the <code>:on-reload</code> and <code>:on-cascade</code> options of <code>defstate</code> are gone, just as the <code>on-reload</code> function</p>
 <h2><a href="#no-more-graphs" name="no-more-graphs"></a>No more graphs</h2>
