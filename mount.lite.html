@@ -9,14 +9,13 @@ be used when the corresponding var key is started. The
 `with-substitutes` macro offers a nicer syntax.</pre></div></div><div class="public anchor" id="var-defstate"><h3>defstate</h3><h4 class="type">macro</h4><div class="usage"><code>(defstate name &amp; args)</code></div><div class="doc"><pre class="plaintext">Define a state. At least a :start expression should be supplied.
 Optionally one can define a :stop expression. Supports docstring and
 attribute map.</pre></div></div><div class="public anchor" id="var-start"><h3>start</h3><div class="usage"><code>(start)</code><code>(start up-to-var)</code></div><div class="doc"><pre class="plaintext">Start all the loaded defstates, or only the defstates up to the
-given state var. Only stopped defstates are started, and they are
-started in the context of the current thread.</pre></div></div><div class="public anchor" id="var-state"><h3>state</h3><h4 class="type">macro</h4><div class="usage"><code>(state &amp; {:keys [start stop name], :or {name &quot;-anonymous-&quot;}})</code></div><div class="doc"><pre class="plaintext">Create an anonymous state, useful for substituting. Supports three
+given state var. Only stopped defstates are started. They are
+started in the context of the current session.</pre></div></div><div class="public anchor" id="var-state"><h3>state</h3><h4 class="type">macro</h4><div class="usage"><code>(state &amp; {:keys [start stop name], :or {name &quot;-anonymous-&quot;}})</code></div><div class="doc"><pre class="plaintext">Create an anonymous state, useful for substituting. Supports three
 keyword arguments. A required :start expression, an optional :stop
 expression, and an optional :name for the state.</pre></div></div><div class="public anchor" id="var-status"><h3>status</h3><div class="usage"><code>(status)</code></div><div class="doc"><pre class="plaintext">Retrieve status map for all states.
 </pre></div></div><div class="public anchor" id="var-stop"><h3>stop</h3><div class="usage"><code>(stop)</code><code>(stop down-to-var)</code></div><div class="doc"><pre class="plaintext">Stop all the loaded defstates, or only the defstates down to the
-given state var. Only started defstates are stopped, and they are
-stopped in the context of the current or parent thread where they
-were started.</pre></div></div><div class="public anchor" id="var-with-session"><h3>with-session</h3><h4 class="type">macro</h4><div class="usage"><code>(with-session &amp; body)</code></div><div class="doc"><pre class="plaintext">Creates a new thread, with a new system of states. All states are
+given state var. Only started defstates are stopped. They are
+stopped in the context of the current session.</pre></div></div><div class="public anchor" id="var-with-session"><h3>with-session</h3><h4 class="type">macro</h4><div class="usage"><code>(with-session &amp; body)</code></div><div class="doc"><pre class="plaintext">Creates a new thread, with a new system of states. All states are
 initially in the stopped status in this thread, regardless of the
 status in the thread that spawns this new session. This spawned
 thread and its subthreads will automatically use the states that are
